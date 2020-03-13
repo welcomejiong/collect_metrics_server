@@ -1,0 +1,152 @@
+{
+	"type": "record",
+	"name": "ConnectDefault",
+	"namespace": "io.confluent.connect.avro",
+	"fields": [
+		{
+			"name": "clientId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "userId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "appkey",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "mac",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "macMd5",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "ifa",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "ifaMd5",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "uuid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "actType",
+			"type": [
+				"null",
+				"int"
+			],
+			"default": null
+		},
+		{
+			"name": "actTime",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "pf",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "ip",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "userAgent",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "extra",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "trackingDs",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "version",
+			"type": [
+				"null",
+				"int"
+			],
+			"default": null
+		},
+		{
+			"name": "udid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "roleid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		}
+	],
+	"connect.version": 1
+}

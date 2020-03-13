@@ -1,0 +1,12 @@
+#constant.yaml
+--- !!org.corps.bi.datacenter.connect.core.Constant
+
+ metricConsumeThreadCoreSize: 8
+
+ metricConsumeThreadMaxPoolSize: 10
+ 
+ metricSinkTriggerThreadSize: 5
+
+
+
+

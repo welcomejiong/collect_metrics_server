@@ -1,0 +1,186 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.corps.bi.datacenter</groupId>
+		<artifactId>collect_metrics_server</artifactId>
+		<version>8.3.0-SNAPSHOT</version>
+	</parent>
+	<groupId>com.hoolai.bi</groupId>
+	<artifactId>collect_metrics_server_web</artifactId>
+	<version>8.3.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>collect_metrics_server_web-web</name>
+	<description>collect_metrics_server_web</description>
+
+	<properties>
+		<projectName>collect_metrics_server_web</projectName>
+	</properties>
+
+	<build>
+		<finalName>${projectName}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>${dir.name}/**</include>
+					<include>spring/**</include>
+					<include>messages/**</include>
+					<include>sqlmap/**</include>
+					<include>templates/**</include>
+					<include>*</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>spring/appContext.xml</include>
+					<include>constant_globle.properties</include>
+				</includes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>spring/appContext.xml</include>
+					<include>spring/**</include>
+					<include>*</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>spring/appContext.xml</include>
+				</includes>
+			</testResource>
+		</testResources>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>local</value>
+				</property>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<dir.name>envs/local</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>online</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>online</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/online</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+		
+		<profile>
+			<id>online2</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>online2</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/online2</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+		
+		
+		<profile>
+			<id>transfer</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>transfer</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/transfer</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+		
+		<profile>
+			<id>transfer2</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>transfer2</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/transfer2</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+		
+		
+		
+		
+		<profile>
+			<id>game</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>game</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/game</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.corps.bi.datacenter</groupId>
+			<artifactId>collect_metrics_server_backend</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- 测试 -->
+		<dependency>
+			<groupId>com.hoolai</groupId>
+			<artifactId>spring-jmock</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.hoolai.bi</groupId>
+		    <artifactId>common_test</artifactId>
+		    <version>0.0.1-SNAPSHOT</version>
+		    <scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

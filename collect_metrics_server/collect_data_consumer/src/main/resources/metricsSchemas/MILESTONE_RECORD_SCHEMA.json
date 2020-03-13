@@ -1,0 +1,88 @@
+{
+	"type": "record",
+	"name": "ConnectDefault",
+	"namespace": "io.confluent.connect.avro",
+	"fields": [
+		{
+			"name": "clientId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "userId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "milestone",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "value",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "milestoneDate",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "milestoneTime",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "extra",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "version",
+			"type": [
+				"null",
+				"int"
+			],
+			"default": null
+		},
+		{
+			"name": "udid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "roleid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		}
+	],
+	"connect.version": 1
+}

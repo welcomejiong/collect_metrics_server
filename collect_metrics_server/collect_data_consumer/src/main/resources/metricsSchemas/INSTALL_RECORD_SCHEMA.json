@@ -1,0 +1,120 @@
+{
+	"type": "record",
+	"name": "ConnectDefault",
+	"namespace": "io.confluent.connect.avro",
+	"fields": [
+		{
+			"name": "clientId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "userId",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "source",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "affiliate",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "creative",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "family",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "genus",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "fromUid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "installDate",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "installTime",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "extra",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "version",
+			"type": [
+				"null",
+				"int"
+			],
+			"default": null
+		},
+		{
+			"name": "udid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		},
+		{
+			"name": "roleid",
+			"type": [
+				"null",
+				"string"
+			],
+			"default": null
+		}
+	],
+	"connect.version": 1
+}

@@ -1,0 +1,14 @@
+#constant.yaml
+--- !!org.corps.bi.datacenter.connect.core.Constant
+
+ metricConsumeThreadCoreSize: 5
+
+ metricConsumeThreadMaxPoolSize: 8
+ 
+ metricSinkTriggerThreadSize: 3
+
+ kafkaConsumerConfigFilePath: /Users/guojianjiong/work/dev_projects/collect_data_consumer/src/main/resources/envs/local/kafka_consumer.properties
+
+
+
+

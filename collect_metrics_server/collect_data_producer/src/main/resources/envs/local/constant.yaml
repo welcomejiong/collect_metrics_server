@@ -1,0 +1,8 @@
+#constant.yaml
+--- !!com.hoolai.datacenter.core.Constant
+
+kafkaConsumerConfigFilePath: envs/local/kafka_producer.properties
+
+
+
+

@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.corps.bi.datacenter</groupId>
+		<artifactId>collect_metrics_server</artifactId>
+		<version>8.3.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>collect_data_producer</artifactId>
+	<properties>
+		<projectName>collect_data_producer-${project.version}</projectName>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<build>
+		<finalName>${projectName}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>${dir.name}/**</include>
+					<include>spring/**</include>
+					<include>messages/**</include>
+					<include>sqlmap/**</include>
+					<include>templates/**</include>
+					<include>*</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>spring/appContext.xml</include>
+					<include>constant_globle.properties</include>
+				</includes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>spring/appContext.xml</include>
+					<include>spring/**</include>
+					<include>*</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>spring/appContext.xml</include>
+				</includes>
+			</testResource>
+		</testResources>
+		<plugins>
+		</plugins>
+		
+	</build>
+
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>local</value>
+				</property>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<dir.name>envs/local</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>online</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>online</value>
+				</property>
+			</activation>
+			<properties>
+				<dir.name>envs/online</dir.name>
+				<jdbc.properties>${dir.name}/jdbc.properties</jdbc.properties>
+			</properties>
+		</profile>
+	</profiles>
+	<dependencies>
+		<dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-lang3</artifactId>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.yaml</groupId>
+		  <artifactId>snakeyaml</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.kafka</groupId>
+		    <artifactId>kafka-clients</artifactId>
+		</dependency>
+			
+		<dependency>
+			<groupId>org.corps.bi.datacenter</groupId>
+			<artifactId>collect_metrics_core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+	</dependencies>
+</project>

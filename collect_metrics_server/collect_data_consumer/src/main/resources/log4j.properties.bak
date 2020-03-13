@@ -1,0 +1,17 @@
+log4j.rootLogger=INFO,stdout
+
+log4j.logger.stdout=INFO,stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender    
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout    
+log4j.appender.stdout.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%m]%n   
+
+log4j.logger.tracking=DEBUG,tracking
+log4j.appender.tracking=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.tracking.File=${catalina.home}/logs/bi/tracking.log
+log4j.appender.tracking.Append=true
+log4j.appender.tracking.Threshold=DEBUG
+log4j.appender.tracking.layout=org.apache.log4j.PatternLayout
+log4j.appender.tracking.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss}] [%5p] [%m]%n
+
+
+

@@ -1,0 +1,8 @@
+#constant.yaml
+--- !!org.corps.bi.datacenter.producer.core.Constant
+
+kafkaConsumerConfigFilePath: envs/online2/kafka_producer-v2.properties
+
+
+
+
