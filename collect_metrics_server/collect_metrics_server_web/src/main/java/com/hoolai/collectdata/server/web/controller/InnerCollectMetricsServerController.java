@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
+import org.corps.bi.datacenter.core.DataCenterTopics;
 import org.corps.bi.protobuf.BytesList;
 import org.corps.bi.protobuf.KVEntity;
 import org.corps.bi.protobuf.LongEntity;
@@ -36,10 +40,23 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 	
 	private  MetricProcesser metricProcesserKafka;
 	
+	private final Map<String,MutablePair<AtomicLong, AtomicLong>> metricProcessNumMap;
+	
 	public InnerCollectMetricsServerController() {
 		super();
+		this.metricProcessNumMap=new ConcurrentHashMap<String,MutablePair<AtomicLong, AtomicLong>>(DataCenterTopics.values().length);
+		
 		if(Constant.IS_FINAL_DATACENTER) {
 			this.metricProcesserKafka=new MetricProcesserKafkaImpl();
+		}
+		this.init();
+	}
+	
+	private void init() {
+		for (DataCenterTopics dataCenterTopic : DataCenterTopics.values()) {
+			// left:请求次数  right:请求处理的数据数
+			MutablePair<AtomicLong, AtomicLong> mutablePair=new MutablePair<AtomicLong, AtomicLong>(new AtomicLong(0),new AtomicLong(0));
+			this.metricProcessNumMap.put(dataCenterTopic.getMetric(), mutablePair);
 		}
 	}
 	
@@ -50,6 +67,8 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 		Map<String,Object> ret=new HashMap<String, Object>();
 		List<KV<String,Boolean>> resultList=new ArrayList<KV<String,Boolean>>();
 		try {
+		
+			
 			String metric=request.getParameter("metric");
 			String version=request.getParameter("version");
 			String recordNumStr=request.getParameter("recordNum");
@@ -62,6 +81,10 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 			if(StringUtils.isNotEmpty(dataSizeStr)) {
 				dataSize=Integer.parseInt(dataSizeStr);
 			}
+			
+			MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=this.metricProcessNumMap.get(metric);
+			
+			Long rts=mutableProcessNumPair.getLeft().incrementAndGet();
 			
 			String status="unProcess";
 			List<MultipartFile> metricDatas=request.getFiles("metricDatas");
@@ -86,8 +109,14 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 			}
 			ret.put("resultList", resultList);
 			ret.put("status", status);
-			long end=System.currentTimeMillis();
-			LOGGER.info("metric:{} recordNum:{} dataSize:{} version:{} status:{} spendMills:{}",metric,recordNumStr,dataSizeStr,version,status,(end-begin));
+			
+			long metricProcessedNum = mutableProcessNumPair.getRight().addAndGet(recordNum);
+			
+			if(rts!=null && rts%100==0) {
+				long end=System.currentTimeMillis();
+				LOGGER.info("metric:{} requestTimes:{}  metricProcessedNum:{} recordNum:{} dataSize:{} version:{} status:{} spendMills:{}",metric,rts,metricProcessedNum,recordNumStr,dataSizeStr,version,status,(end-begin));
+			}
+			
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 			ret.put("status", "err");
