@@ -238,7 +238,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 				if(values==null||values.isEmpty()){
 					// 如果beginKeyId到endKeyId，没有值存在，则继续把序号往前推进，一直到当前指标的值（currentMetricId）
 					RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, endKeyId);
-					LOGGER.warn("metric:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} the key of values is empty!...",this.metric,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
+					LOGGER.warn("metric:{} fetchDataTimes:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} the key of values is empty!...",this.metric,fdt,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
 					return ;
 				}
 				
@@ -292,7 +292,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 				long end=System.currentTimeMillis();
 				
 				if(fdt%100==0) {
-					LOGGER.info("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} spendMills:({})",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes,(end-begin));
+					LOGGER.info("metric:{} fetchDataTimes:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} spendMills:({})",this.metric,fdt,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes,(end-begin));
 				}
 				
 				
