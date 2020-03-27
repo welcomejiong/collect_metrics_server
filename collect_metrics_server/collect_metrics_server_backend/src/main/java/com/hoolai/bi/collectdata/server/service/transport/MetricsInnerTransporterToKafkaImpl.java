@@ -223,7 +223,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 					keys.add(keyEnity.toByteArray());
 					queryCfList.add(metricColumnFamilyHandle);
 				}
-				LOGGER.info("metric:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} begining...",this.metric,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
+				//LOGGER.info("metric:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} begining...",this.metric,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
 				
 				Map<byte[], byte[]> values = rockdb.multiGet(queryCfList,keys);
 				
@@ -281,12 +281,13 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 					LOGGER.warn("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} failed. try next time!",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes);
 				}
 				
+				long end=System.currentTimeMillis();
 				
 				if(tmpTriggerProcessedNum%1000==0) {
-					LOGGER.info("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{}",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes);
+					LOGGER.info("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} spendMills:({})",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes,(end-begin));
 				}
 				
-				long end=System.currentTimeMillis();
+				
 				if(LOGGER.isDebugEnabled()){
 					LOGGER.debug(" transport end... lastKeyId:{} succRecordsNum:{} spendMills:({})",currentMaxProcessedId,succ,(end-begin));
 				}
