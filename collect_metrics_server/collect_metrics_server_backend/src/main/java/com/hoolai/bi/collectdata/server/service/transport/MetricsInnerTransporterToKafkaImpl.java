@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbCleanedGlobalManager;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
@@ -88,7 +89,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 		
 		private  final MetricProcesser metricProcesserKafka;
 		
-		private final Map<String,AtomicLong> metricProcessedRecordNumMap=new ConcurrentHashMap<String, AtomicLong>();
+		private final Map<String,MutablePair<AtomicLong, AtomicLong>> metricProcessedRecordNumMap=new ConcurrentHashMap<String, MutablePair<AtomicLong, AtomicLong>>();
 		
 		
 		public TriggerThread(MetricsTransporterConfig transporterConfig,MetricProcesser metricProcesserKafka) {
@@ -125,15 +126,16 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 			
 			String metric=metricRocksdbColumnFamily.getMetric();
 			
-			AtomicLong processedRecordNum=this.getMetricProcessedRecordNum(metric);
+			MutablePair<AtomicLong, AtomicLong> processedRecordNumPair=this.getMetricProcessedRecordNum(metric);
 			
-			this.threadPoolExecutor.submit(new FetchDataThread(metricRocksdbColumnFamily,this.transporterConfig,processedRecordNum,this.metricProcesserKafka));
+			this.threadPoolExecutor.submit(new FetchDataThread(metricRocksdbColumnFamily,this.transporterConfig,processedRecordNumPair,this.metricProcesserKafka));
 		}
 		
-		private AtomicLong getMetricProcessedRecordNum(String metric) {
+		private MutablePair<AtomicLong, AtomicLong> getMetricProcessedRecordNum(String metric) {
 			if(!this.metricProcessedRecordNumMap.containsKey(metric)) {
-				AtomicLong tmp=new AtomicLong(0);
-				this.metricProcessedRecordNumMap.put(metric, tmp);
+				// left:处理次数  right:处理的记录数
+				MutablePair<AtomicLong, AtomicLong> mutablePair=new MutablePair<AtomicLong, AtomicLong>(new AtomicLong(0),new AtomicLong(0));
+				this.metricProcessedRecordNumMap.put(metric, mutablePair);
 			}
 			
 			return this.metricProcessedRecordNumMap.get(metric);
@@ -163,15 +165,18 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 		
 		private final int batchSize;
 		
+		private final AtomicLong fetchDataTimes;
+		
 		private final AtomicLong processedRecordNum;
 		
 		private  final MetricProcesser metricProcesserKafka;
 
-		public FetchDataThread(final MetricRocksdbColumnFamilys metricRocksdbColumnFamily,final MetricsTransporterConfig transporterConfig,final AtomicLong processedRecordNum,final MetricProcesser metricProcesserKafka) {
+		public FetchDataThread(final MetricRocksdbColumnFamilys metricRocksdbColumnFamily,final MetricsTransporterConfig transporterConfig,final MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,final MetricProcesser metricProcesserKafka) {
 			super();
 			this.metricRocksdbColumnFamily=metricRocksdbColumnFamily;
 			this.transporterConfig=transporterConfig;
-			this.processedRecordNum=processedRecordNum;
+			this.fetchDataTimes=processedRecordNumPair.getLeft();
+			this.processedRecordNum=processedRecordNumPair.getRight();
 			this.metric=this.metricRocksdbColumnFamily.getMetric();
 			this.batchSize = this.transporterConfig.getBatchSize();
 			this.metricProcesserKafka=metricProcesserKafka;
@@ -201,6 +206,9 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 		 */
 		private void pollMetricsV2(){
 			try {
+				
+				long fdt=this.fetchDataTimes.incrementAndGet();
+				
 				long begin=System.currentTimeMillis();
 				int succ=0;
 				RocksDB rockdb=RocksdbManager.getInstance().getRocksdb();
@@ -283,7 +291,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 				
 				long end=System.currentTimeMillis();
 				
-				if(tmpTriggerProcessedNum%1000==0) {
+				if(fdt%100==0) {
 					LOGGER.info("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} spendMills:({})",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes,(end-begin));
 				}
 				
