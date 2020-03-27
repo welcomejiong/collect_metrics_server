@@ -183,7 +183,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 			try {
 				isLock=RocksdbGlobalManager.getInstance().tryLockProcessed(this.metric);
 				if(!isLock) {
-					LOGGER.info("metric:{} fetch data try lock is fail!",this.metric);
+					//LOGGER.info("metric:{} fetch data try lock is fail!",this.metric);
 					return ;
 				}
 				this.pollMetricsV2();
@@ -223,10 +223,14 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 					keys.add(keyEnity.toByteArray());
 					queryCfList.add(metricColumnFamilyHandle);
 				}
+				LOGGER.info("metric:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} begining...",this.metric,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
 				
 				Map<byte[], byte[]> values = rockdb.multiGet(queryCfList,keys);
 				
 				if(values==null||values.isEmpty()){
+					// 如果beginKeyId到endKeyId，没有值存在，则继续把序号往前推进，一直到当前指标的值（currentMetricId）
+					RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, endKeyId);
+					LOGGER.warn("metric:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} expectValues:{} the key of values is empty!...",this.metric,processedId,currentMetricId,beginKeyId,endKeyId,(endKeyId-beginKeyId));
 					return ;
 				}
 				
@@ -268,13 +272,16 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 					}
 				}
 				
+				long tmpTriggerProcessedNum=this.processedRecordNum.addAndGet(addTimes);
 				
 				if(isSucc) {
 					RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, currentMaxProcessedId);
 					RocksdbCleanedGlobalManager.getInstance().addNeedCleanIds(this.metric,processedIdList);
+				}else {
+					LOGGER.warn("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} failed. try next time!",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes);
 				}
 				
-				long tmpTriggerProcessedNum=this.processedRecordNum.addAndGet(addTimes);
+				
 				if(tmpTriggerProcessedNum%1000==0) {
 					LOGGER.info("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} currentMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{}",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,currentMaxProcessedId,tmpTriggerProcessedNum,addTimes);
 				}
