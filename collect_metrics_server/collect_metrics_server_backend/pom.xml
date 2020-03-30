@@ -13,6 +13,7 @@
 
 	<properties>
 		<projectName>collect_metrics_server_backend</projectName>
+		<record.metrics.api.version>8.4.0-SNAPSHOT</record.metrics.api.version>
 	</properties>
 
 	<build>
@@ -180,6 +181,7 @@
 		<dependency>
 		  <groupId>org.corps.bi</groupId>
 		  <artifactId>RecordMetricsAPI</artifactId>
+		  <version>${record.metrics.api.version}</version>
 		</dependency>
 		
 		<dependency>
