@@ -8,13 +8,14 @@
 	</parent>
 	<groupId>com.hoolai.bi</groupId>
 	<artifactId>collect_metrics_server_web</artifactId>
-	<version>8.3.0-SNAPSHOT</version>
+	<version>8.4.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>collect_metrics_server_web-web</name>
 	<description>collect_metrics_server_web</description>
 
 	<properties>
 		<projectName>collect_metrics_server_web</projectName>
+		<record.metrics.api.version>8.4.0-SNAPSHOT</record.metrics.api.version>
 	</properties>
 
 	<build>
@@ -162,11 +163,20 @@
 			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+		  <groupId>org.corps.bi</groupId>
+		  <artifactId>RecordMetricsAPI</artifactId>
+		  <version>${record.metrics.api.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.corps.bi.datacenter</groupId>
 			<artifactId>collect_metrics_server_backend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		
 		
 		<!-- 测试 -->
 		<dependency>

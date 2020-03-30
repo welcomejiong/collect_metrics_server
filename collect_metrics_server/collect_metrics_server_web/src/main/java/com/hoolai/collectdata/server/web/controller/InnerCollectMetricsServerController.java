@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.corps.bi.core.MetricLoggerControl;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
 import org.corps.bi.datacenter.core.DataCenterTopics;
@@ -36,7 +37,7 @@ import com.jian.tools.util.JSONUtils;
 @Controller
 public class InnerCollectMetricsServerController extends AbstractPanelController{
 	
-	private static final Logger LOGGER=LoggerFactory.getLogger(InnerCollectMetricsServerController.class.getSimpleName());
+	private static final Logger LOGGER=LoggerFactory.getLogger(InnerCollectMetricsServerController.class);
 	
 	private  MetricProcesser metricProcesserKafka;
 	
@@ -112,7 +113,9 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 			
 			long metricProcessedNum = mutableProcessNumPair.getRight().addAndGet(recordNum);
 			
-			if(rts!=null && rts%100==0) {
+			MetricLoggerControl metricLoggerControl=MetricLoggerControl.parseFromName(metric);
+			
+			if(rts!=null && rts%metricLoggerControl.getPerNum()==0) {
 				long end=System.currentTimeMillis();
 				LOGGER.info("metric:{} requestTimes:{}  metricProcessedNum:{} recordNum:{} dataSize:{} version:{} status:{} spendMills:{}",metric,rts,metricProcessedNum,recordNumStr,dataSizeStr,version,status,(end-begin));
 			}
