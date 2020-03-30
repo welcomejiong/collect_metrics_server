@@ -9,6 +9,7 @@
 
 	<artifactId>collect_metrics_server_backend</artifactId>
 	<name>collect_metrics_server_backend</name>
+	<version>8.4.0-SNAPSHOT</version>
 	<description>collect_metrics_server_backend</description>
 
 	<properties>

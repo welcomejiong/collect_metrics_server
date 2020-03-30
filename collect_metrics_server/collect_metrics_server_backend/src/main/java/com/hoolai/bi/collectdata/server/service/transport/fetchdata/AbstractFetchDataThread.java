@@ -3,6 +3,7 @@ package com.hoolai.bi.collectdata.server.service.transport.fetchdata;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.corps.bi.core.MetricLoggerControl;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
 import org.corps.bi.transport.MetricsTransporterConfig;
@@ -27,7 +28,9 @@ public abstract class AbstractFetchDataThread implements Runnable{
 	
 	protected final AtomicLong processedRecordNum;
 	
-	protected  final MetricProcesser metricProcesserKafka;
+	protected final MetricProcesser metricProcesserKafka;
+	
+	protected final int metricLoggerPerNum;
 	
 	public AbstractFetchDataThread(final MetricRocksdbColumnFamilys metricRocksdbColumnFamily,final MetricsTransporterConfig transporterConfig,final MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,final MetricProcesser metricProcesserKafka) {
 		super();
@@ -38,6 +41,7 @@ public abstract class AbstractFetchDataThread implements Runnable{
 		this.metric=this.metricRocksdbColumnFamily.getMetric();
 		this.batchSize = this.transporterConfig.getBatchSize();
 		this.metricProcesserKafka=metricProcesserKafka;
+		this.metricLoggerPerNum=MetricLoggerControl.parseFromName(this.metric).getPerNum();
 	}
 
 	@Override

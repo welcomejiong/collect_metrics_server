@@ -110,7 +110,7 @@ public class FetchDataThreadV3 extends AbstractFetchDataThread {
 			
 			long end=System.currentTimeMillis();
 			
-			if(fdt%100==0) {
+			if(fdt%super.metricLoggerPerNum==0) {
 				LOGGER.info("metric:{} fetchDataTimes:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} triggerProcessedNum:{} currentProcessSize:{} spendMills:({})",this.metric,fdt,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,tmpTriggerProcessedNum,addTimes,(end-begin));
 			}
 			
