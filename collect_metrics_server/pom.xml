@@ -21,6 +21,8 @@
 		<bi.core.version>0.0.2-SNAPSHOT</bi.core.version>
 		<bi.compress.version>0.0.1-SNAPSHOT</bi.compress.version>
 		<bi.record.metrics.version>8.3.0-SNAPSHOT</bi.record.metrics.version>
+		<record.metrics.api.version>8.4.0-SNAPSHOT</record.metrics.api.version>
+		<collect.data.producer.version>8.4.0-SNAPSHOT</collect.data.producer.version>
 	</properties>
 	
 	<modules>
@@ -130,7 +132,7 @@
 			<dependency>
 			  <groupId>org.corps.bi</groupId>
 			  <artifactId>RecordMetricsAPI</artifactId>
-			  <version>${bi.record.metrics.version}</version>
+			  <version>${record.metrics.api.version}</version>
 			  <exclusions>
 			  	<exclusion>
 			  		<groupId>log4j</groupId>
@@ -150,7 +152,7 @@
 			<dependency>
 			  <groupId>org.corps.bi.datacenter</groupId>
 			  <artifactId>collect_data_producer</artifactId>
-			  <version>${bi.record.metrics.version}</version>
+			  <version>${collect.data.producer.version}</version>
 			  <exclusions>
 			  	<exclusion>
 			  		<groupId>log4j</groupId>

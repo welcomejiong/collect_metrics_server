@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.corps.bi.core.Constants;
 import org.corps.bi.dao.rocksdb.CatMetricsInRocksdb;
+import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
 import org.corps.bi.transport.MetricsTransporterConfig;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,23 @@ public class MetricMessController extends AbstractPanelController{
 		}
 		
 		return CatMetricsInRocksdb.getInstance().catAll();
+	}
+	
+	@RequestMapping(value = "/metrics/processedid/", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public Object metricsUp(@RequestParam(required=true) String userName,@RequestParam(required=true) String metric,@RequestParam(required=true) Long needToProcessId,HttpServletRequest request,HttpServletResponse response,Model model){
+		
+		if(!"jianjiongguo".equals(userName)) {
+			return "please input the valid userName.";
+		}
+		
+		RocksdbGlobalManager.getInstance().saveProcessedId(metric, needToProcessId);
+		
+		Map<String,Object> ret=new 	HashMap<String,Object>();
+		ret.put("metric", metric);
+		ret.put("needToProcessId", needToProcessId);
+		
+		return ret;
 	}
 	
 	@RequestMapping(value = "/server/mess/", method = { RequestMethod.GET,RequestMethod.POST })
