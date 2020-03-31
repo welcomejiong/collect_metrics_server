@@ -19,11 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import com.hoolai.bi.collectdata.server.service.collect.MetricProcesser;
 
-public class FetchDataThreadV3 extends AbstractFetchDataThread {
+public class FetchDataToKafkaThreadV3 extends AbstractFetchDataThread {
 	
-	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataThreadV3.class);
+	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataToKafkaThreadV3.class);
 
-	public FetchDataThreadV3(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
+	public FetchDataToKafkaThreadV3(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
 			MetricsTransporterConfig transporterConfig, MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,
 			MetricProcesser metricProcesserKafka) {
 		super(metricRocksdbColumnFamily, transporterConfig, processedRecordNumPair, metricProcesserKafka);
@@ -68,12 +68,16 @@ public class FetchDataThreadV3 extends AbstractFetchDataThread {
 			}
 			
 			int addTimes=0;
+			int valueIsNullNum=0;
 			boolean isSucc=false;
-			long succMaxProcessedId=0;
-			for (int i = 0; i < keys.size(); i++) {
+			// 再次设定processedId，如果默认为0，如果后续处理失败，则会重新传输数据
+			long succMaxProcessedId=processedId;
+			int keySize=keys.size();
+			for (int i = 0; i < keySize; i++) {
 				
 				byte[] value= rowValues.get(i);
 				if(value==null) {
+					valueIsNullNum++;
 					continue;
 				}
 				
@@ -90,7 +94,8 @@ public class FetchDataThreadV3 extends AbstractFetchDataThread {
 					}
 					addTimes++;
 				}else {
-					LOGGER.warn("metric:{} fetchDataTimes:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} failedKeyId:{} add to kafka  res:{} failed!...",this.metric,fdt,processedId,currentMetricId,beginKeyId,endKeyId,keyEnity.getValue(),isSucc);
+					LOGGER.warn("metric:{} fetchDataTimes:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} addTimes:{} forIdx:{} failedKeyId:{} add to kafka  res:{} failed!...",
+								this.metric,fdt,processedId,currentMetricId,beginKeyId,endKeyId,addTimes,i,keyEnity.getValue(),isSucc);
 					// 如果有任何一个失败了，则之后的重新发送
 					break;
 				}
@@ -102,9 +107,19 @@ public class FetchDataThreadV3 extends AbstractFetchDataThread {
 				RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, endKeyId);
 				RocksdbCleanedGlobalManagerV2.getInstance().addNeedCleanIds(this.metric,beginKeyId,endKeyId);
 			}else {
-				RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, succMaxProcessedId);
-				RocksdbCleanedGlobalManagerV2.getInstance().addNeedCleanIds(this.metric,beginKeyId,succMaxProcessedId);
-				LOGGER.warn("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{} triggerProcessedNum:{} currentProcessSize:{} failed. try next time!",this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,tmpTriggerProcessedNum,addTimes);
+				// 如果所有值都是NULL，那就正常按照批量KEY的大小推进
+				if(valueIsNullNum==keySize) {
+					RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, endKeyId);
+					LOGGER.warn("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{}  succMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} the value all null. go normal next time!",
+							this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,succMaxProcessedId,tmpTriggerProcessedNum,addTimes);
+				}else {
+					RocksdbGlobalManager.getInstance().saveProcessedId(this.metric, succMaxProcessedId);
+					RocksdbCleanedGlobalManagerV2.getInstance().addNeedCleanIds(this.metric,beginKeyId,succMaxProcessedId);
+					
+					LOGGER.warn("metric:{} isSucc:{} processedId:{} currentMetricId:{} beginKeyId:{}  endKeyId:{}  succMaxProcessedId:{} triggerProcessedNum:{} currentProcessSize:{} sub failed. try next time!",
+								this.metric,isSucc,processedId,currentMetricId,beginKeyId,endKeyId,succMaxProcessedId,tmpTriggerProcessedNum,addTimes);
+				}
+				
 			}
 			
 			long end=System.currentTimeMillis();

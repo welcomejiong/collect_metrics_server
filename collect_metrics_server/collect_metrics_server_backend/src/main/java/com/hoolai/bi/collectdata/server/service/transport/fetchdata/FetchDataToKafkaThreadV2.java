@@ -26,11 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import com.hoolai.bi.collectdata.server.service.collect.MetricProcesser;
 
-public class FetchDataThreadV2 extends AbstractFetchDataThread {
+public class FetchDataToKafkaThreadV2 extends AbstractFetchDataThread {
 	
-	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataThreadV2.class);
+	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataToKafkaThreadV2.class);
 
-	public FetchDataThreadV2(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
+	public FetchDataToKafkaThreadV2(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
 			MetricsTransporterConfig transporterConfig, MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,
 			MetricProcesser metricProcesserKafka) {
 		super(metricRocksdbColumnFamily, transporterConfig, processedRecordNumPair, metricProcesserKafka);

@@ -23,7 +23,7 @@ import com.hoolai.bi.collectdata.server.core.Constant;
 import com.hoolai.bi.collectdata.server.service.collect.MetricProcesser;
 import com.hoolai.bi.collectdata.server.service.collect.MetricProcesserKafkaImpl;
 import com.hoolai.bi.collectdata.server.service.transport.fetchdata.AbstractFetchDataThread;
-import com.hoolai.bi.collectdata.server.service.transport.fetchdata.FetchDataThreadV3;
+import com.hoolai.bi.collectdata.server.service.transport.fetchdata.FetchDataToKafkaThreadV3;
 
 public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransporter {
 	
@@ -115,7 +115,7 @@ public class MetricsInnerTransporterToKafkaImpl implements MetricsInnerTransport
 			
 			MutablePair<AtomicLong, AtomicLong> processedRecordNumPair=this.getMetricProcessedRecordNum(metric);
 			
-			AbstractFetchDataThread fetchDataThread=new FetchDataThreadV3(metricRocksdbColumnFamily,this.transporterConfig,processedRecordNumPair,this.metricProcesserKafka);
+			AbstractFetchDataThread fetchDataThread=new FetchDataToKafkaThreadV3(metricRocksdbColumnFamily,this.transporterConfig,processedRecordNumPair,this.metricProcesserKafka);
 			
 			this.threadPoolExecutor.submit(fetchDataThread);
 		}
