@@ -28,7 +28,7 @@ import com.hoolai.bi.collectdata.server.service.collect.MetricProcesser;
 
 public class FetchDataThreadV2 extends AbstractFetchDataThread {
 	
-	private static final Logger LOGGER=LoggerFactory.getLogger(AbstractFetchDataThread.class);
+	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataThreadV2.class);
 
 	public FetchDataThreadV2(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
 			MetricsTransporterConfig transporterConfig, MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,

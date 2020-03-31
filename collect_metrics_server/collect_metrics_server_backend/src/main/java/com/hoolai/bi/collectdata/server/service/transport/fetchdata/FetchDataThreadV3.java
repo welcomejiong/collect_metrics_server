@@ -14,7 +14,6 @@ import org.corps.bi.protobuf.LongEntity;
 import org.corps.bi.transport.MetricsTransporterConfig;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,7 @@ import com.hoolai.bi.collectdata.server.service.collect.MetricProcesser;
 
 public class FetchDataThreadV3 extends AbstractFetchDataThread {
 	
-	private static final Logger LOGGER=LoggerFactory.getLogger(AbstractFetchDataThread.class);
+	private static final Logger LOGGER=LoggerFactory.getLogger(FetchDataThreadV3.class);
 
 	public FetchDataThreadV3(MetricRocksdbColumnFamilys metricRocksdbColumnFamily,
 			MetricsTransporterConfig transporterConfig, MutablePair<AtomicLong, AtomicLong> processedRecordNumPair,
