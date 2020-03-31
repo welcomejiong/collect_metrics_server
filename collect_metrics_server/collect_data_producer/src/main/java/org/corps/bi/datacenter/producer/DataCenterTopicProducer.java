@@ -42,7 +42,7 @@ public class DataCenterTopicProducer<K,V> {
 			return true;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
-			return false;
+			throw e;
 		}
 	
 	}

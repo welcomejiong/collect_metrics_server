@@ -40,7 +40,7 @@ public class TopicProducerManager {
 	public boolean send(String topic,byte[] key,byte[] body){
 		DataCenterTopicProducer<byte[], byte[]> producer=this.producerCache.get(topic);
 		if(producer==null) {
-			return false;
+			throw new RuntimeException("the kafka topic:"+topic+" is not in datacenter.please create it!");
 		}
 		return producer.send(key, body);
 		
