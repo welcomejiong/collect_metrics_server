@@ -36,17 +36,20 @@ public class MetricMessController extends AbstractPanelController{
 	
 	@RequestMapping(value = "/metrics/processedid/", method = { RequestMethod.GET,RequestMethod.POST })
 	@ResponseBody
-	public Object metricsUp(@RequestParam(required=true) String userName,@RequestParam(required=true) String metric,@RequestParam(required=true) Long needToProcessId,HttpServletRequest request,HttpServletResponse response,Model model){
+	public Object metricsUp(@RequestParam(required=true) String userName,@RequestParam(required=true) String metric,@RequestParam(required=false) Long needToProcessId,HttpServletRequest request,HttpServletResponse response,Model model){
 		
 		if(!"jianjiongguo".equals(userName)) {
 			return "please input the valid userName.";
 		}
-		
-		RocksdbGlobalManager.getInstance().saveProcessedId(metric, needToProcessId);
+		if(needToProcessId!=null) {
+			RocksdbGlobalManager.getInstance().saveProcessedId(metric, needToProcessId);
+		}
 		
 		Map<String,Object> ret=new 	HashMap<String,Object>();
 		ret.put("metric", metric);
 		ret.put("needToProcessId", needToProcessId);
+		ret.put("currentProcessId", RocksdbGlobalManager.getInstance().getProcessedId(metric));
+		ret.put("currentMetricId", RocksdbGlobalManager.getInstance().getCurrentId(metric));
 		
 		return ret;
 	}
