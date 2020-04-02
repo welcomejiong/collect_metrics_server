@@ -48,6 +48,11 @@ public class FileOperator {
 	 */
 	private final AtomicBoolean isPersistenting;
 	
+	/**
+	 * 什么时候开始正式接收数据，进行数据的持久化
+	 */
+	private long beginPerpistMills=0l;
+	
 	public FileOperator(ConnectMetricConfig connectMetricConfig,Meta partitionMeta,String filePrefix) {
 		super();
 		try {
@@ -137,11 +142,12 @@ public class FileOperator {
 		boolean allowPersistent=this.applyPersistent();
 		try {
 			if(!allowPersistent){
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("{} isExpire:{} createTime:{} is persistenting ...",this.currentFile.getAbsolutePath(),this.isExpire(),this.createTimeMills);
-				}
+				LOGGER.debug("{} isExpire:{} createTime:{} is persistenting ...",this.currentFile.getAbsolutePath(),this.isExpire(),this.createTimeMills);
 				return false;
 			}
+			
+			this.checkBeginPersistMills();
+			
 			BytesList bytesList=new BytesList();
 			bytesList.add(bytes);
 			//this.outputStream.write(bytes);
@@ -178,11 +184,12 @@ public class FileOperator {
 		boolean allowPersistent=this.applyPersistent();
 		try {
 			if(!allowPersistent){
-				if(LOGGER.isDebugEnabled()){
-					LOGGER.debug("{} isExpire:{} createTime:{} is persistenting ...",this.currentFile.getAbsolutePath(),this.isExpire(),this.createTimeMills);
-				}
+				LOGGER.debug("{} isExpire:{} createTime:{} is persistenting ...",this.currentFile.getAbsolutePath(),this.isExpire(),this.createTimeMills);
 				return false;
 			}
+			
+			this.checkBeginPersistMills();
+			
 			BytesList bytesList=new BytesList();
 			bytesList.addAll(datas);
 			SimpleListProto simpleListProto=bytesList.copyTo();
@@ -209,6 +216,14 @@ public class FileOperator {
 			}
 		}
 		return false;
+	}
+	/**
+	 * 第一次接收到数据，初始化开始持久化的时间
+	 */
+	private void checkBeginPersistMills() {
+		if(this.beginPerpistMills==0l) {
+			this.beginPerpistMills=System.currentTimeMillis();
+		}
 	}
 	
 	public void flush(){
@@ -285,7 +300,8 @@ public class FileOperator {
 	 * @return
 	 */
 	public boolean isExpire(){
-		return (System.currentTimeMillis()-this.createTimeMills)/1000>=this.connectMetricConfig.getRotateInterval();
+		return (System.currentTimeMillis()-this.beginPerpistMills)/1000>=this.connectMetricConfig.getRotateInterval();
+		//return (System.currentTimeMillis()-this.createTimeMills)/1000>=this.connectMetricConfig.getRotateInterval();
 	}
 	
 	private boolean isCanReceiveContent(){
