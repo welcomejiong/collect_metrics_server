@@ -1,0 +1,20 @@
+#constant.yaml
+--- !!org.corps.db.cassandra.core.CassandraConfig
+
+server:
+  publish : false
+
+#cassandra
+cassandraCluster:
+  contactPoints: 
+    - 127.0.0.1
+    - 192.168.10.56
+  port: 9042
+  userName: sango
+  password: hoolai!@#
+  keyspaces: 
+    - sango_backup
+
+
+
+

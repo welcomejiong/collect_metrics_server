@@ -1,0 +1,19 @@
+--- !!org.corps.bi.datacenter.connect.core.ConnectMetricConfig
+
+ name: hdfs_gameinfo
+ topic: gameinfo
+ dataDir: /Users/guojianjiong/work/app_datas/data_center/kafka_consumer_to_hdfs_datas/gameinfo
+ #多少秒
+ rotateInterval: 300
+ maxDataFileSize: 209715200
+ appendNewline: true
+ lineTerminateBy: \n
+ hdfsUrl: hdfs://nn01.games.com
+ warehousePath: hdfs://nn01.games.com/user/hive/warehouse/rawdatas
+ maxCombineDataFileSize: 209715200
+ metricSinkTriggeRrotateIntervalSeconds: 30
+ metricTransferThreadCoreSize: 2
+ metricTransferThreadMaxSize: 3
+ hiveIntegration: true
+ 
+ 

@@ -1,0 +1,29 @@
+#constant.yaml
+--- !!org.corps.bi.datacenter.connect.core.Constant
+
+ metricConsumeThreadCoreSize: 5
+
+ metricConsumeThreadMaxPoolSize: 8
+ 
+ metricSinkTriggerThreadSize: 3
+
+ kafkaConsumerConfigFilePath: /Users/guojianjiong/work/dev_projects/collect_data_consumer/src/main/resources/envs/local/kafka_consumer.properties
+
+# cassandra info
+ cassandraConfig:
+    serverInfo:
+     publish: false
+    cassandraCluster:
+     contactPoints: 
+       - 127.0.0.1
+       - 10.2.80.88
+     port: 9042
+     #userName: sango
+     #password: hoolai!@#
+     userName: cassandra
+     password: jiong
+     keyspaces: 
+       - rawdatas
+
+
+

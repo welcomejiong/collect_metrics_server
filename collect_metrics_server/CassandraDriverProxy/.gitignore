@@ -1,0 +1,7 @@
+/target/
+/.classpath
+/.project
+/.settings
+/metastore_db
+/spark_warehouse
+/derby.log

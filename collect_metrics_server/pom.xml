@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.corps.bi</groupId>
 		<artifactId>bi-metrics-parent</artifactId>
-		<version>8.3.0-SNAPSHOT</version>
+		<version>8.5.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.corps.bi.datacenter</groupId>
 	<artifactId>collect_metrics_server</artifactId>

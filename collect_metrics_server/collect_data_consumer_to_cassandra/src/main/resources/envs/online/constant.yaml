@@ -1,0 +1,28 @@
+#constant.yaml
+--- !!org.corps.bi.datacenter.connect.core.Constant
+
+ metricConsumeThreadCoreSize: 8
+
+ metricConsumeThreadMaxPoolSize: 10
+ 
+ metricSinkTriggerThreadSize: 5
+
+
+# cassandra info
+ cassandraConfig:
+    serverInfo:
+     publish: false
+    cassandraCluster:
+     contactPoints: 
+       - 127.0.0.1
+       - 10.2.80.88
+     port: 9042
+     #userName: sango
+     #password: hoolai!@#
+     userName: cassandra
+     password: jiong
+     keyspaces: 
+       - rawdatas
+
+
+
