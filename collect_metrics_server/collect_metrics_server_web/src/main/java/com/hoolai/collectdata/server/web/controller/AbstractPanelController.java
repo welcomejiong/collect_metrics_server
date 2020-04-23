@@ -2,9 +2,14 @@ package com.hoolai.collectdata.server.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.corps.bi.datacenter.core.DataCenterTopics;
 
 import com.jian.tools.util.HttpClientUtils;
 import com.jian.tools.util.ServletUtils;
@@ -31,6 +36,10 @@ public abstract class AbstractPanelController {
 	public static final String BEGIN_DATE = "beginTime";
 	public static final String END_DATE = "endTime";
 	
+	public AbstractPanelController() {
+		super();
+	}
+
 	public String forward(String url){
 		return "forward:"+url;
 	}

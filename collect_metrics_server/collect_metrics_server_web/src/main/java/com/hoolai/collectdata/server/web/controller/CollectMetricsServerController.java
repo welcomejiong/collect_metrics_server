@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.codehaus.jackson.type.TypeReference;
+import org.corps.bi.core.MetricLoggerControl;
 import org.corps.bi.core.MetricRequestParams;
 import org.corps.bi.core.MetricResponse;
 import org.corps.bi.metrics.AdTracking;
@@ -45,7 +48,7 @@ import com.hoolai.bi.collectdata.server.service.collect.MetricProcesserKafkaImpl
 import com.jian.tools.util.JSONUtils;
 
 @Controller
-public class CollectMetricsServerController extends AbstractPanelController{
+public class CollectMetricsServerController extends AbstractCollectController{
 	
 	private static final Logger LOGGER=LoggerFactory.getLogger(CollectMetricsServerController.class.getSimpleName());
 	
@@ -66,7 +69,10 @@ public class CollectMetricsServerController extends AbstractPanelController{
 	public MetricResponse collectMetrics(@RequestParam String datas,HttpServletRequest request,HttpServletResponse response,Model model){
 		MetricResponse ret=new MetricResponse();
 		try {
+			long begin=System.currentTimeMillis();
+			
 			boolean res=false;
+			
 			TypeReference<List<MetricRequestParams>> typeReference=new TypeReference<List<MetricRequestParams>>() {};
 			List<MetricRequestParams> metricRequestParams=JSONUtils.fromJSON(datas, typeReference, false);
 			if(metricRequestParams==null||metricRequestParams.isEmpty()) {
@@ -74,8 +80,20 @@ public class CollectMetricsServerController extends AbstractPanelController{
 			}else {
 				for (MetricRequestParams metricRequestParam : metricRequestParams) {
 					try {
+						
+						MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=super.metricProcessNumMap.get(metricRequestParam.getMetric());
+						Long rts=mutableProcessNumPair.getLeft().incrementAndGet();
+						
 						IMetric imetric=MetricEntityConverterManager.parseFromName(metricRequestParam.getMetric()).parseMetricEntityFromJson(metricRequestParam.getJsonData());
 						this.recordingServices.add(metricRequestParam.getGameId(), metricRequestParam.getDs(), imetric);
+						
+						long metricProcessedNum = mutableProcessNumPair.getRight().incrementAndGet();
+						MetricLoggerControl metricLoggerControl=MetricLoggerControl.parseFromName(metricRequestParam.getMetric());
+						if(rts!=null && rts%metricLoggerControl.getPerNum()==0) {
+							long end=System.currentTimeMillis();
+							LOGGER.info("jsonMultiReq metric:{} requestTimes:{}  metricProcessedNum:{} recordNum:{} isSucc:{} spendMills:{}",metricRequestParam.getMetric(),rts,metricProcessedNum,1,true,(end-begin));
+						}
+						
 					} catch (Exception e) {
 						LOGGER.error(e.getMessage(),e);
 					}
@@ -88,6 +106,7 @@ public class CollectMetricsServerController extends AbstractPanelController{
 				ret.setStatus("fail");
 			}
 		} catch (Exception e) {
+			LOGGER.error(datas);
 			LOGGER.error(e.getMessage(),e);
 			ret.setStatus("err");
 			ret.setMsg(e.getMessage());
@@ -102,8 +121,14 @@ public class CollectMetricsServerController extends AbstractPanelController{
 	public MetricResponse collectMetric(@RequestParam String datas,HttpServletRequest request,HttpServletResponse response,Model model){
 		MetricResponse ret=new MetricResponse();
 		try {
+			long begin=System.currentTimeMillis();
 			boolean res=false;
 			MetricRequestParams metricRequestParams=JSONUtils.fromJSON(datas, MetricRequestParams.class);
+			
+			MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=super.metricProcessNumMap.get(metricRequestParams.getMetric());
+			
+			Long rts=mutableProcessNumPair.getLeft().incrementAndGet();
+			
 			IMetric imetric=MetricEntityConverterManager.parseFromName(metricRequestParams.getMetric()).parseMetricEntityFromJson(metricRequestParams.getJsonData());
 			this.recordingServices.add(metricRequestParams.getGameId(), metricRequestParams.getDs(), imetric);
 			res=true;
@@ -113,7 +138,17 @@ public class CollectMetricsServerController extends AbstractPanelController{
 				ret.setStatus("fail");
 			}
 			
+			long metricProcessedNum = mutableProcessNumPair.getRight().incrementAndGet();
+			
+			MetricLoggerControl metricLoggerControl=MetricLoggerControl.parseFromName(metricRequestParams.getMetric());
+			
+			if(rts!=null && rts%metricLoggerControl.getPerNum()==0) {
+				long end=System.currentTimeMillis();
+				LOGGER.info("jsonSingleReq metric:{} requestTimes:{}  metricProcessedNum:{} recordNum:{} isSucc:{} spendMills:{}",metricRequestParams.getMetric(),rts,metricProcessedNum,1,res,(end-begin));
+			}
+			
 		} catch (Exception e) {
+			LOGGER.error(datas);
 			LOGGER.error(e.getMessage(),e);
 			ret.setStatus("err");
 			ret.setMsg(e.getMessage());
@@ -130,8 +165,14 @@ public class CollectMetricsServerController extends AbstractPanelController{
 								HttpServletRequest request,HttpServletResponse response,Model model){
 		MetricResponse ret=new MetricResponse();
 		try {
+			long begin=System.currentTimeMillis();
+			
 			IMetric  entityMetric=MetricRequestParser.parseFromName(metric).doParse(request);
 			boolean res=false;
+
+			MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=super.metricProcessNumMap.get(entityMetric.metric());
+			Long rts=mutableProcessNumPair.getLeft().incrementAndGet();
+			
 			this.recordingServices.add(gameId, ds, entityMetric);
 			res=true;
 			if(res){
@@ -140,6 +181,12 @@ public class CollectMetricsServerController extends AbstractPanelController{
 				ret.setStatus("fail");
 			}
 			
+			long metricProcessedNum = mutableProcessNumPair.getRight().incrementAndGet();
+			MetricLoggerControl metricLoggerControl=MetricLoggerControl.parseFromName(entityMetric.metric());
+			if(rts!=null && rts%metricLoggerControl.getPerNum()==0) {
+				long end=System.currentTimeMillis();
+				LOGGER.info("normalSingleReq metric:{} requestTimes:{}  metricProcessedNum:{} recordNum:{} isSucc:{} spendMills:{}",entityMetric.metric(),rts,metricProcessedNum,1,res,(end-begin));
+			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 			ret.setStatus("err");

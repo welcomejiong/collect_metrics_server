@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +14,6 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.corps.bi.core.MetricLoggerControl;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
-import org.corps.bi.datacenter.core.DataCenterTopics;
 import org.corps.bi.protobuf.BytesList;
 import org.corps.bi.protobuf.KVEntity;
 import org.corps.bi.protobuf.LongEntity;
@@ -35,32 +33,18 @@ import com.hoolai.bi.report.util.KV;
 import com.jian.tools.util.JSONUtils;
 
 @Controller
-public class InnerCollectMetricsServerController extends AbstractPanelController{
+public class InnerCollectMetricsServerController extends AbstractCollectController{
 	
 	private static final Logger LOGGER=LoggerFactory.getLogger(InnerCollectMetricsServerController.class);
 	
 	private  MetricProcesser metricProcesserKafka;
 	
-	private final Map<String,MutablePair<AtomicLong, AtomicLong>> metricProcessNumMap;
-	
 	public InnerCollectMetricsServerController() {
 		super();
-		this.metricProcessNumMap=new ConcurrentHashMap<String,MutablePair<AtomicLong, AtomicLong>>(DataCenterTopics.values().length);
-		
 		if(Constant.IS_FINAL_DATACENTER) {
 			this.metricProcesserKafka=new MetricProcesserKafkaImpl();
 		}
-		this.init();
 	}
-	
-	private void init() {
-		for (DataCenterTopics dataCenterTopic : DataCenterTopics.values()) {
-			// left:请求次数  right:请求处理的数据数
-			MutablePair<AtomicLong, AtomicLong> mutablePair=new MutablePair<AtomicLong, AtomicLong>(new AtomicLong(0),new AtomicLong(0));
-			this.metricProcessNumMap.put(dataCenterTopic.getMetric(), mutablePair);
-		}
-	}
-	
 
 	@RequestMapping(value = {"/inner/transport/"}, method = {RequestMethod.POST })
 	public void collect(MultipartHttpServletRequest request,HttpServletResponse response,Model model){
@@ -83,7 +67,7 @@ public class InnerCollectMetricsServerController extends AbstractPanelController
 				dataSize=Integer.parseInt(dataSizeStr);
 			}
 			
-			MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=this.metricProcessNumMap.get(metric);
+			MutablePair<AtomicLong, AtomicLong> mutableProcessNumPair=super.metricProcessNumMap.get(metric);
 			
 			Long rts=mutableProcessNumPair.getLeft().incrementAndGet();
 			
