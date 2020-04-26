@@ -20,8 +20,8 @@
 		<hoolai.common.service.version>2.0.0-SNAPSHOT</hoolai.common.service.version>
 		<bi.core.version>0.0.2-SNAPSHOT</bi.core.version>
 		<bi.compress.version>0.0.1-SNAPSHOT</bi.compress.version>
-		<bi.record.metrics.version>8.3.0-SNAPSHOT</bi.record.metrics.version>
-		<record.metrics.api.version>8.4.0-SNAPSHOT</record.metrics.api.version>
+		<bi.record.metrics.version>8.5.0-SNAPSHOT</bi.record.metrics.version>
+		<record.metrics.api.version>8.5.0-SNAPSHOT</record.metrics.api.version>
 		<collect.data.producer.version>8.4.0-SNAPSHOT</collect.data.producer.version>
 	</properties>
 	

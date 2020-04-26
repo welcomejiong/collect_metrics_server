@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.corps.bi.datacenter</groupId>
+		<artifactId>collect_metrics_server</artifactId>
+		<version>8.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>collect_metrics_server_statistics</artifactId>
+	<name>collect_metrics_server_statistics</name>
+	<version>8.5.0-SNAPSHOT</version>
+	<description>collect_metrics_server_statistics</description>
+
+	<properties>
+		<projectName>collect_metrics_server_statistics</projectName>
+	</properties>
+
+	<build>
+		<finalName>${projectName}</finalName>
+	</build>
+
+
+	<dependencies>
+		
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.corps.bi.common</groupId>
+			<artifactId>common-tools</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.corps.bi</groupId>
+			<artifactId>collect_common_protobuf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.corps.bi</groupId>
+			<artifactId>RecordMetricsToProtoConverter</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.corps.bi.datacenter</groupId>
+			<artifactId>collect_metrics_core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>redis.clients</groupId>
+		    <artifactId>jedis</artifactId>
+		</dependency>
+		
+		
+
+	</dependencies>
+</project>

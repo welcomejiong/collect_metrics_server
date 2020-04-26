@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.corps.bi.datacenter.server.statistics.proto";
+option java_outer_classname = "StatisticsProto";
+
+package statistics;
+
+message StorageStatisticKeyProto{
+	 string metric=1;
+	 string snId=2; 
+	 string gameId=3;
+	 string ds=4;
+}
+
+
