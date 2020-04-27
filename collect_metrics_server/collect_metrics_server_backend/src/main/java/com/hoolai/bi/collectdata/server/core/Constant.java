@@ -71,6 +71,8 @@ public class Constant {
 	
 	public static boolean IS_FINAL_DATACENTER=false;
 	
+	public static boolean IS_STATISTICS=false;
+	
 	static {
 		init();
 	}
@@ -143,6 +145,11 @@ public class Constant {
 		String finalDataCenterStr=constantProperties.getProperty("is_final_datacenter");
 		if(finalDataCenterStr!=null){
 			IS_FINAL_DATACENTER=Boolean.parseBoolean(finalDataCenterStr);
+		}
+		
+		String statisticsStr=constantProperties.getProperty("is_statistics");
+		if(statisticsStr!=null){
+			IS_STATISTICS=Boolean.parseBoolean(statisticsStr);
 		}
 	}
 	
