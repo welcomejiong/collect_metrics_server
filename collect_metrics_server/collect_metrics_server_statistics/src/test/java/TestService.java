@@ -81,7 +81,7 @@ public class TestService {
 	@Test
 	public void testGetDatas() throws Exception {
 		
-		JedisPool jedisPool=new JedisPool(new GenericObjectPoolConfig(),"127.0.0.1", 6379,3000,"jiong");
+		JedisPool jedisPool=new JedisPool(new GenericObjectPoolConfig(),"10.2.21.36", 6379,3000,"hoolai_bigdatas");
 		
 		MetricStatisticRepoRedisImpl metricStatisticRepo=new MetricStatisticRepoRedisImpl(jedisPool);
 		
