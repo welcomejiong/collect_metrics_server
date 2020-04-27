@@ -9,7 +9,6 @@
 
 	<artifactId>collect_metrics_server_statistics</artifactId>
 	<name>collect_metrics_server_statistics</name>
-	<version>8.5.0-SNAPSHOT</version>
 	<description>collect_metrics_server_statistics</description>
 
 	<properties>

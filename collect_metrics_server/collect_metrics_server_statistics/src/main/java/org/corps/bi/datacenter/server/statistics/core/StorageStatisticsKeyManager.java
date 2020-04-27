@@ -1,7 +1,8 @@
 package org.corps.bi.datacenter.server.statistics.core;
 
+import java.io.UnsupportedEncodingException;
+
 import org.corps.bi.metrics.Meta;
-import org.corps.bi.metrics.converter.MetaConverter;
 import org.corps.bi.protobuf.common.StorageKeyV2Proto;
 
 import com.google.protobuf.ByteString;
@@ -12,13 +13,12 @@ public class StorageStatisticsKeyManager {
 
 	private static final Long METRIC_DAY_BUSIFLAG = 10000L;
 
-	public static byte[] getMetricDayKey(Meta metricDayMeta) {
-		MetaConverter metaConverter = new MetaConverter(metricDayMeta);
+	public static byte[] getMetricDayKey(Meta metricDayMeta) throws UnsupportedEncodingException {
 		StorageKeyV2Proto.Builder builder = StorageKeyV2Proto.newBuilder();
 		builder.setUserId(GLOBLE_USER_ID);
 		builder.setBusiFlag(METRIC_DAY_BUSIFLAG);
 		builder.setKeyFlag(0);
-		builder.setExtra(ByteString.copyFrom(metaConverter.toByteArray()));
+		builder.setExtra(ByteString.copyFrom(metricDayMeta.getMetaId(), Constant.DEFAULT_CHARSET));
 		return builder.build().toByteArray();
 	}
 

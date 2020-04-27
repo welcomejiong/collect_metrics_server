@@ -92,6 +92,8 @@ public class MetricStatisticServiceImpl implements MetricStatisticService {
 		private final MetricStatisticRepo metricStatisticRepo;
 		
 		private final BlockingQueue<MetricNumIncrement> metricNumIncrementQueue;
+		
+		private long perpistTimes=0;
 
 		public AsyncPersistToRedisThread(MetricStatisticRepo metricStatisticRepo,BlockingQueue<MetricNumIncrement> metricNumIncrementQueue) {
 			super();
@@ -114,13 +116,17 @@ public class MetricStatisticServiceImpl implements MetricStatisticService {
 				for (int i = 0; i < BATCH_TO_DB_SIZE; i++) {
 					MetricNumIncrement metricNumIncrement=this.metricNumIncrementQueue.poll();
 					if(metricNumIncrement==null){
-						return ;
+						break ;
 					}
 					batchList.add(metricNumIncrement);
 				}
 				this.metricStatisticRepo.incrMetricNum(batchList);
+				perpistTimes++;
 				long end=System.currentTimeMillis();
-				LOGGER.info("batch to redis the size:{} spendMills:{}",batchList.size(),(end-begin));
+				if(perpistTimes%100==0) {
+					LOGGER.info("batch to redis perpistTimes:{}  batchSize:{}  currentSize:{} spendMills:{}",this.perpistTimes,BATCH_TO_DB_SIZE,batchList.size(),(end-begin));
+				}
+				
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(),e);
 			}

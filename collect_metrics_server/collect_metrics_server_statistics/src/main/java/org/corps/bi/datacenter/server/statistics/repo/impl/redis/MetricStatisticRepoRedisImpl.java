@@ -1,5 +1,6 @@
 package org.corps.bi.datacenter.server.statistics.repo.impl.redis;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,9 @@ public class MetricStatisticRepoRedisImpl implements MetricStatisticRepo {
 			jedis = this.jedisPool.getResource();
 			byte[] key=StorageStatisticsKeyManager.getMetricDayKey(metricDayMeta);
 			byte[] field=ByteString.copyFrom(secondField, Constant.DEFAULT_CHARSET).toByteArray();
-			return jedis.hincrBy(key, field, incrNum);
+			Long currVal = jedis.hincrBy(key, field, incrNum);
+			this.checkMetricExpire(jedis, key);
+			return currVal;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 		}finally {
@@ -57,13 +60,18 @@ public class MetricStatisticRepoRedisImpl implements MetricStatisticRepo {
 		Jedis jedis=null;
 		try {
 			jedis = this.jedisPool.getResource();
+			Map<String,byte[]> keys=new HashMap<String,byte[]>();
 			Pipeline pipeline=jedis.pipelined();
 			for (MetricNumIncrement metricNumIncrement : metricNumIncrements) {
 				byte[] key=StorageStatisticsKeyManager.getMetricDayKey(metricNumIncrement.getMetricDayMeta());
 				byte[] field=ByteString.copyFrom(metricNumIncrement.getSecondField(), Constant.DEFAULT_CHARSET).toByteArray();
 				pipeline.hincrBy(key, field, metricNumIncrement.getIncrNum());
+				if(!keys.containsKey(metricNumIncrement.getMetricDayMeta().getMetaId())) {
+					keys.put(metricNumIncrement.getMetricDayMeta().getMetaId(), key);
+				}
 			}
 			pipeline.sync();
+			this.checkMetricExpire(jedis, keys.values());
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);
 		}finally {
@@ -72,6 +80,19 @@ public class MetricStatisticRepoRedisImpl implements MetricStatisticRepo {
 			}
 		}
 		
+	}
+	
+	private void checkMetricExpire(Jedis jedis,Collection<byte[]> keys) {
+		for (byte[] key : keys) {
+			this.checkMetricExpire(jedis, key);
+		}
+	}
+	
+	private void checkMetricExpire(Jedis jedis,byte[] key) {
+		Long ttl=jedis.ttl(key);
+		if(ttl<0) {
+			jedis.expire(key, Constant.ONE_DAY_SECONDS*7);
+		}
 	}
 
 

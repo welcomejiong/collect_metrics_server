@@ -78,5 +78,28 @@ public class TestService {
 		TimeUnit.MINUTES.sleep(10);
 	}
 	
+	@Test
+	public void testGetDatas() throws Exception {
+		
+		JedisPool jedisPool=new JedisPool(new GenericObjectPoolConfig(),"127.0.0.1", 6379,3000,"jiong");
+		
+		MetricStatisticRepoRedisImpl metricStatisticRepo=new MetricStatisticRepoRedisImpl(jedisPool);
+		
+		MetricStatisticService metricStatisticService=new MetricStatisticServiceImpl(metricStatisticRepo);
+		
+		Meta metricDayMeta=new Meta();
+		metricDayMeta.setMetric("counter");
+		metricDayMeta.setSnId("1");
+		metricDayMeta.setGameId("1");
+		metricDayMeta.setDs("2020-04-27");
+		
+		
+		Map<String,Long> allNum=metricStatisticService.getMetricNum(metricDayMeta);
+		for (Entry<String,Long> entry : allNum.entrySet()) {
+			System.out.println("key:"+entry.getKey()+" val:"+entry.getValue());
+		}
+		
+	}
+	
 	
 }
