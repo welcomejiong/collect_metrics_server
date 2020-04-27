@@ -2,9 +2,12 @@ package com.hoolai.collectdata.server.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +17,15 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.corps.bi.core.MetricLoggerControl;
 import org.corps.bi.dao.rocksdb.MetricRocksdbColumnFamilys;
 import org.corps.bi.dao.rocksdb.RocksdbGlobalManager;
+import org.corps.bi.datacenter.server.statistics.service.MetricStatisticService;
+import org.corps.bi.metrics.Meta;
+import org.corps.bi.metrics.converter.MetaConverter;
 import org.corps.bi.protobuf.BytesList;
 import org.corps.bi.protobuf.KVEntity;
 import org.corps.bi.protobuf.LongEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +45,9 @@ public class InnerCollectMetricsServerController extends AbstractCollectControll
 	private static final Logger LOGGER=LoggerFactory.getLogger(InnerCollectMetricsServerController.class);
 	
 	private  MetricProcesser metricProcesserKafka;
+	
+	@Autowired(required=false)
+	private MetricStatisticService metricStatisticService;
 	
 	public InnerCollectMetricsServerController() {
 		super();
@@ -215,9 +225,11 @@ public class InnerCollectMetricsServerController extends AbstractCollectControll
 		if(dataList==null||dataList.isEmpty()) {
 			return true;
 		}
-		
+		Map<String,MutablePair<Meta, Long>> statisticsDatas=new HashMap<String,MutablePair<Meta, Long>>();
 		Map<byte[],byte[]> batchDataMap=new HashMap<byte[],byte[]>();
 		for (byte[] metricData : dataList) {
+			
+			this.doMetricStatistics(metricData,statisticsDatas);
 			
 			byte[] rockV=metricData;
 			
@@ -230,10 +242,40 @@ public class InnerCollectMetricsServerController extends AbstractCollectControll
 		}
 		MetricRocksdbColumnFamilys metricRocksdbColumnFamily=MetricRocksdbColumnFamilys.parseFromName(metric);
 		if(metricRocksdbColumnFamily==null) {
+			LOGGER.error("innerProcessMetricDatas metric:{}  receiveRecordNum:{} is not defined MetricRocksdbColumnFamilys.",metric,dataList.size());
 			return false;
 		}
 		metricRocksdbColumnFamily.getMetricDao().saveBatch(batchDataMap);
+		
+		this.persistMetricStatistics(statisticsDatas);
+		
 		return true;
 
 	}
+	
+	private void doMetricStatistics(byte[] metricData,final Map<String,MutablePair<Meta, Long>> statisticsDatas) {
+		if(!Constant.IS_STATISTICS) {
+			return ;
+		}
+		KVEntity kvEntity=new KVEntity(metricData);
+		MetaConverter metaConverter=new MetaConverter(kvEntity.getK());
+		String key=metaConverter.getEntity().getMetaId();
+		if(statisticsDatas.containsKey(key)) {
+			MutablePair<Meta, Long> statisticsData=statisticsDatas.get(key);
+			statisticsData.setRight(statisticsData.getRight()+1);
+		}else {
+			statisticsDatas.put(key, new MutablePair<Meta, Long>(metaConverter.getEntity(),new Long(1)));
+		}
+	}
+	
+	private void persistMetricStatistics(final Map<String,MutablePair<Meta, Long>> statisticsDatas) {
+		if(!Constant.IS_STATISTICS) {
+			return ;
+		}
+		Date now=new Date();
+		for (Entry<String,MutablePair<Meta, Long>> entry : statisticsDatas.entrySet()) {
+			this.metricStatisticService.incrMetricNum(TimeUnit.SECONDS, 5, now, entry.getValue().left, entry.getValue().getRight());
+		}
+	}
+	
 }

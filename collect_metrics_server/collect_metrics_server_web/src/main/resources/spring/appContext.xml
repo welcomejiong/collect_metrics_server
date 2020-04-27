@@ -32,7 +32,8 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:${jdbc.properties}</value>
+				<value>classpath:${dir.name}/jdbc.properties</value>
+				<value>classpath:${dir.name}/redis_config.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -40,5 +41,6 @@
 	<import resource="classpath:spring/daoContext.xml"/>
 	<import resource="classpath:spring/serviceContext.xml"/>
 	<import resource="classpath:${dir.name}/quartzContext.xml" />
+	<import resource="classpath:${dir.name}/specialContext.xml" />
 	
 </beans>

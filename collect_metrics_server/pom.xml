@@ -28,6 +28,7 @@
 	<modules>
 		<module>collect_metrics_core</module>
 		<module>collect_data_producer</module>
+		<module>collect_metrics_server_statistics</module>
 		<!-- 
 		<module>collect_metrics_server_backend</module>
 		<module>collect_metrics_server_web</module>

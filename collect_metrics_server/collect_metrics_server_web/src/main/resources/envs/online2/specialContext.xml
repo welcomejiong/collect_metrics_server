@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+	        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+	        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+	        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd"
+	        >
+		<bean id="jedisPool" class="redis.clients.jedis.JedisPool" destroy-method="close">
+			<constructor-arg>
+				<bean class="org.apache.commons.pool2.impl.GenericObjectPoolConfig">
+					<property name="minIdle">
+						<value>${redis.datacenter.minIdle}</value>
+					</property>
+					<property name="maxIdle">
+						<value>${redis.datacenter.maxIdle}</value>
+					</property>
+					<property name="maxTotal">
+						<value>${redis.datacenter.maxTotal}</value>
+					</property>
+					<property name="jmxNameBase">
+						<value>${redis.datacenter.jmxNameBase}</value>
+					</property>
+				</bean>
+			</constructor-arg>
+			<constructor-arg>
+				<value>${redis.datacenter.host}</value>
+			</constructor-arg>
+			<constructor-arg>
+				<value>${redis.datacenter.port}</value>
+			</constructor-arg>
+			<constructor-arg>
+				<value>${redis.datacenter.connectionTimeout}</value>
+			</constructor-arg>
+			<constructor-arg>
+				<value>${redis.datacenter.password}</value>
+			</constructor-arg>
+			
+		</bean>
+		
+		<bean id="metricStatisticRepo" class="org.corps.bi.datacenter.server.statistics.repo.impl.redis.MetricStatisticRepoRedisImpl">
+			<constructor-arg>
+				<ref bean="jedisPool"/>
+			</constructor-arg>
+		</bean>
+		
+		<bean id="metricStatisticService" class="org.corps.bi.datacenter.server.statistics.service.impl.MetricStatisticServiceImpl">
+			<constructor-arg>
+				<ref bean="metricStatisticRepo"/>
+			</constructor-arg>
+		</bean>
+		
+		
+	
+	
+</beans>
