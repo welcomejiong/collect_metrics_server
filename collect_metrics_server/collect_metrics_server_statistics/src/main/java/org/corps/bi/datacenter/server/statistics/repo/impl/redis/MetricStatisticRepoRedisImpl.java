@@ -57,6 +57,11 @@ public class MetricStatisticRepoRedisImpl implements MetricStatisticRepo {
 		if(metricNumIncrements==null||metricNumIncrements.isEmpty()) {
 			return ;
 		}
+		if(metricNumIncrements.size()==1) {
+			MetricNumIncrement metricNumIncrement=metricNumIncrements.get(0);
+			this.incrMetricNum(metricNumIncrement.getMetricDayMeta(), metricNumIncrement.getSecondField(), metricNumIncrement.getIncrNum());
+			return ;
+		}
 		Jedis jedis=null;
 		try {
 			jedis = this.jedisPool.getResource();
